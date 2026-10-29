@@ -11,6 +11,8 @@ struct DockPolicyHarness {
         print("PASS: live preference controls both hide/show directions")
         try DockPolicyTestScenarios.matchingPoliciesSkipSetter()
         print("PASS: matching policies skip setter and preserve settings")
+        try DockPolicyTestScenarios.reopenRepairsPolicyDriftWithoutChangingIntent()
+        print("PASS: reopen repairs post-launch policy drift and preserves user intent")
         try DockPolicyTestScenarios.failedSetterPreservesIntentAndReportsFailure()
         print("PASS: failed setters report failure and preserve persisted intent in both directions")
         try DockPolicyTestScenarios.setterResultAndObservedPolicyRemainDistinct()

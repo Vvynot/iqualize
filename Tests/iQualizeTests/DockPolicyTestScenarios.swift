@@ -81,6 +81,38 @@ enum DockPolicyTestScenarios {
         }
     }
 
+    static func reopenRepairsPolicyDriftWithoutChangingIntent() throws {
+        try withStore { store, defaults in
+            for hide in [true, false] {
+                store.set(\.hideFromDock, hide)
+                let before = defaults.data(forKey: iQualizeState.key)
+                let desired: NSApplication.ActivationPolicy = hide ? .accessory : .regular
+                var policy = desired
+                var requests: [NSApplication.ActivationPolicy] = []
+                var transitions: [DockPolicyController.Transition] = []
+                let controller = DockPolicyController(
+                    settings: store,
+                    currentPolicy: { policy },
+                    setPolicy: { requests.append($0); policy = $0; return true },
+                    logTransition: { transitions.append($0) }
+                )
+
+                try check(controller.reconcile(reason: .launchCompleted), "launch reconciliation failed")
+                // Model a policy change after launch, without changing user intent.
+                policy = hide ? .regular : .accessory
+                try check(controller.reconcile(reason: .reopen), "reopen reconciliation failed")
+                try check(policy == desired && requests == [desired], "reopen did not repair policy drift exactly once")
+                try check(transitions.last?.reason == .reopen && transitions.last?.result == true,
+                          "reopen transition lost its reason or setter result")
+                try check(controller.reconcile(reason: .reopen), "matching reopen failed")
+                try check(requests == [desired] && transitions.last?.result == nil,
+                          "matching reopen did not skip the setter")
+                try check(store.state.hideFromDock == hide && defaults.data(forKey: iQualizeState.key) == before,
+                          "reopen changed persisted user intent")
+            }
+        }
+    }
+
     static func failedSetterPreservesIntentAndReportsFailure() throws {
         try withStore { store, defaults in
             store.set(\.balance, 0.25)

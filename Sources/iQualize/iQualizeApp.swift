@@ -95,8 +95,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        // Reopening can promote the app back to regular. Restore the preference
+        // before activating its windows: changing policy can relinquish focus.
+        dockPolicy.reconcile(reason: .reopen)
         if !flag {
             menuBarController?.openEQWindow()
+        } else {
+            sender.activate(ignoringOtherApps: true)
         }
         return true
     }

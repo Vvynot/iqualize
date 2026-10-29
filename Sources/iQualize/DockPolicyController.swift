@@ -9,6 +9,7 @@ final class DockPolicyController {
     enum Reason: String {
         case bootstrap
         case launchCompleted = "launch-completed"
+        case reopen
         case settingsChanged = "settings-changed"
         case dockQuit = "dock-quit"
     }

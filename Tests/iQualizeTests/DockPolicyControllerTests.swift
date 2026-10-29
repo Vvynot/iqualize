@@ -11,6 +11,10 @@ final class DockPolicyControllerTests: XCTestCase {
         try DockPolicyTestScenarios.matchingPoliciesSkipSetter()
     }
 
+    func testReopenRepairsPolicyDriftWithoutChangingIntent() throws {
+        try DockPolicyTestScenarios.reopenRepairsPolicyDriftWithoutChangingIntent()
+    }
+
     func testFailedSetterPreservesIntentAndReportsFailure() throws {
         try DockPolicyTestScenarios.failedSetterPreservesIntentAndReportsFailure()
     }
